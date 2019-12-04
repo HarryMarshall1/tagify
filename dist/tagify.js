@@ -25,7 +25,7 @@ function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(source, true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -352,10 +352,9 @@ Tagify.prototype = {
         if (e.type == "focus") {
           this.DOM.scope.classList.add('tagify--focus');
           this.trigger("focus"); //  e.target.classList.remove('placeholder');
-
-          if (this.settings.dropdown.enabled === 0) {
-            this.dropdown.show.call(this);
-          }
+          // if( this.settings.dropdown.enabled === 0 ){
+          //     this.dropdown.show.call(this);
+          // }
 
           return;
         } else if (e.type == "blur") {
@@ -394,8 +393,10 @@ Tagify.prototype = {
               }, 20);
               break;
             // currently commented to allow new lines in mixed-mode
-            // case 'Enter' :
-            //     e.preventDefault(); // solves Chrome bug - http://stackoverflow.com/a/20398191/104380
+
+            case 'Enter':
+              e.preventDefault();
+            // solves Chrome bug - http://stackoverflow.com/a/20398191/104380
           }
 
           return true;
@@ -524,8 +525,8 @@ Tagify.prototype = {
             index: tagElmIdx,
             data: this.value[tagElmIdx]
           });
-        }
-        if (this.settings.mode == 'select' || this.settings.dropdown.enabled === 0) this.dropdown.show.call(this);
+        } // if( this.settings.mode == 'select' || this.settings.dropdown.enabled === 0 )
+        //     this.dropdown.show.call(this);
       },
       onEditTagInput: function onEditTagInput(editableElm) {
         var tagElm = editableElm.closest('tag'),
@@ -1247,6 +1248,15 @@ Tagify.prototype = {
         _interpolator = this.settings.mixTagsInterpolator;
     this.DOM.input.childNodes.forEach(function (node) {
       if (node.nodeType == 1 && node.classList.contains("tagify__tag")) result += _interpolator[0] + JSON.stringify(_this7.value[i++]) + _interpolator[1];else result += node.textContent;
+    });
+    return result;
+  },
+  getFormattedOutput: function getFormattedOutput() {
+    var result = "",
+        i = 0,
+        _interpolator = this.settings.mixTagsInterpolator;
+    this.DOM.input.childNodes.forEach(function (node) {
+      if (node.nodeType == 1 && node.classList.contains("tagify__tag")) result += _interpolator[0] + node.textContent + _interpolator[1];else result += node.textContent;
     });
     return result;
   },

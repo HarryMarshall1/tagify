@@ -349,9 +349,9 @@ Tagify.prototype = {
                     this.DOM.scope.classList.add('tagify--focus')
                     this.trigger("focus")
                     //  e.target.classList.remove('placeholder');
-                    if( this.settings.dropdown.enabled === 0 ){
-                        this.dropdown.show.call(this);
-                    }
+                    // if( this.settings.dropdown.enabled === 0 ){
+                    //     this.dropdown.show.call(this);
+                    // }
                     return
                 }
 
@@ -389,8 +389,8 @@ Tagify.prototype = {
                             break;
 
                         // currently commented to allow new lines in mixed-mode
-                        // case 'Enter' :
-                        //     e.preventDefault(); // solves Chrome bug - http://stackoverflow.com/a/20398191/104380
+                        case 'Enter' :
+                            e.preventDefault(); // solves Chrome bug - http://stackoverflow.com/a/20398191/104380
                     }
 
                     return true;
@@ -529,8 +529,8 @@ Tagify.prototype = {
                     this.trigger("click", { tag:tagElm, index:tagElmIdx, data:this.value[tagElmIdx] });
                 }
 
-                if( this.settings.mode == 'select' || this.settings.dropdown.enabled === 0 )
-                    this.dropdown.show.call(this);
+                // if( this.settings.mode == 'select' || this.settings.dropdown.enabled === 0 )
+                //     this.dropdown.show.call(this);
             },
 
             onEditTagInput( editableElm ){
@@ -1281,6 +1281,20 @@ Tagify.prototype = {
         this.DOM.input.childNodes.forEach((node) => {
             if( node.nodeType == 1 && node.classList.contains("tagify__tag") )
                 result += _interpolator[0] + JSON.stringify(this.value[i++]) + _interpolator[1]
+            else
+                result += node.textContent;
+        })
+        return result;
+    },
+
+    getFormattedOutput(){
+        var result = "",
+            i = 0,
+            _interpolator = this.settings.mixTagsInterpolator;
+
+        this.DOM.input.childNodes.forEach((node) => {
+            if( node.nodeType == 1 && node.classList.contains("tagify__tag") )
+                result += _interpolator[0] + node.textContent + _interpolator[1]
             else
                 result += node.textContent;
         })
