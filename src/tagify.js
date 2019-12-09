@@ -1615,7 +1615,7 @@ Tagify.prototype = {
 
             if( !value ){
                 return whitelist
-                    .filter(item => !this.isTagDuplicate(item.value || item)) // don't include tags which have already been added.
+                    //.filter(item => !this.isTagDuplicate(item.value || item)) // don't include tags which have already been added.
                     .slice(0, suggestionsCount); // respect "maxItems" dropdown setting
             }
 

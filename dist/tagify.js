@@ -1535,8 +1535,6 @@ Tagify.prototype = {
      * @return {[type]} [description]
      */
     filterListItems: function filterListItems(value) {
-      var _this10 = this;
-
       var list = [],
           whitelist = this.settings.whitelist,
           suggestionsCount = this.settings.dropdown.maxItems || Infinity,
@@ -1548,9 +1546,7 @@ Tagify.prototype = {
           i = 0;
 
       if (!value) {
-        return whitelist.filter(function (item) {
-          return !_this10.isTagDuplicate(item.value || item);
-        }) // don't include tags which have already been added.
+        return whitelist //.filter(item => !this.isTagDuplicate(item.value || item)) // don't include tags which have already been added.
         .slice(0, suggestionsCount); // respect "maxItems" dropdown setting
       }
 
