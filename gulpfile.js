@@ -231,7 +231,7 @@ gulp.task('watch', () => {
 
 
 gulp.task('default', ( done ) => {
-    $.runSequence(['build_js', 'scss'], 'build_jquery_version', 'minify', 'watch', done);
+    $.runSequence(['build_js', 'scss'], 'build_jquery_version', 'minify', /*'watch',*/ done);
 });
 
 
