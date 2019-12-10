@@ -1,5 +1,5 @@
 /**
- * Tagify (v 2.31.6)- tags input component
+ * Tagify (v 2.31.7)- tags input component
  * By Yair Even-Or
  * Don't sell this code. (c)
  * https://github.com/yairEO/tagify
@@ -922,13 +922,14 @@ Tagify.prototype = {
         tagData = _this5.normalizeTags(preInterpolated)[0]; //{value:preInterpolated}
       }
 
-      if (s2.length > 1 && _this5.isTagWhitelisted(tagData.value) && (!duplicates || !_this5.isTagDuplicate(tagData))) {
-        transformTag.call(_this5, tagData);
-        tagElm = _this5.createTagElem(tagData);
-        s2[0] = tagElm.outerHTML; //+ "&#8288;"  // put a zero-space at the end so the caret won't jump back to the start (when the last input's child element is a tag)
+      if (s2.length > 1 && _this5.isTagWhitelisted(tagData.value) //&&   (!duplicates  || !this.isTagDuplicate(tagData)) commented out as it prevent duplicate tags in initial value being parsed
+      ) {
+          transformTag.call(_this5, tagData);
+          tagElm = _this5.createTagElem(tagData);
+          s2[0] = tagElm.outerHTML; //+ "&#8288;"  // put a zero-space at the end so the caret won't jump back to the start (when the last input's child element is a tag)
 
-        _this5.value.push(tagData);
-      }
+          _this5.value.push(tagData);
+        }
 
       return s2.join('');
     }).join('');

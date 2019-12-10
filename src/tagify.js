@@ -961,7 +961,9 @@ Tagify.prototype = {
                 tagData = this.normalizeTags(preInterpolated)[0]  //{value:preInterpolated}
             }
 
-            if( s2.length > 1   &&   this.isTagWhitelisted(tagData.value)   &&   (!duplicates  || !this.isTagDuplicate(tagData)) ){
+            if( s2.length > 1   &&   this.isTagWhitelisted(tagData.value)
+                //&&   (!duplicates  || !this.isTagDuplicate(tagData)) commented out as it prevent duplicate tags in initial value being parsed
+            ){
                 transformTag.call(this, tagData);
                 tagElm = this.createTagElem(tagData);
                 s2[0] = tagElm.outerHTML //+ "&#8288;"  // put a zero-space at the end so the caret won't jump back to the start (when the last input's child element is a tag)
