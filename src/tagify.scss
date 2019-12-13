@@ -3,7 +3,7 @@
     $self: &;
     $tags-border-color       : #DDD !default;
     $tags-hover-border-color : #CCC !default;
-    $tags-focus-border-color : #85C8EA !default;
+    $tags-focus-border-color : #3595f6 !default;
 
     $tagMargin               : 5px !default;
     $tag-pad                 : .3em .5em !default;
@@ -17,7 +17,6 @@
     $tag-remove-btn-bg--hover: darken($tag-remove, 8) !default;
     $tag-invalid-color       : $tag-remove !default;
     $tag-invalid-bg          : rgba($tag-remove, .5) !default;
-    $showX                   : true !default;
     $tag-inset-shadow-size   : 1.1em !default;
 
     // CSS variables
@@ -55,13 +54,17 @@
                                            var(--tag-bg)  50%,
                                            var(--tag-bg)  75%,
                                            transparent    75%,
-                                           transparent)         0/5px 5px;
+                                           transparent)   0/5px 5px;
         box-shadow: none;
         filter: brightness(.95);
     }
 
     @keyframes tags--bump{
         30% { transform: scale(1.2); }
+    }
+
+    @keyframes rotateLoader {
+        to{ transform: rotate(1turn) }
     }
 
     display       : flex;
@@ -76,7 +79,10 @@
     transition    : .1s;
 
     &:hover{ border-color:$tags-hover-border-color; }
-    &.tagify--focus{ border-color: $tags-focus-border-color; }
+    &.tagify--focus{
+      transition:0s;
+      border-color: $tags-focus-border-color;
+    }
 
     // Global "read-only" mode (no input button)
     &[readonly]{
@@ -96,6 +102,23 @@
         }
     }
 
+    &--loading{
+        #{ $self }__input{
+            &::after{
+                content: '';
+                vertical-align: middle;
+                margin: -2px 0 -2px .5em;
+                opacity: 1;
+                width: .7em;
+                height: .7em;
+                border: 3px solid;
+                border-color: #EEE #BBB #888 transparent;
+                border-radius: 50%;
+                animation: rotateLoader .4s infinite linear;
+            }
+        }
+    }
+
     ///////////////////////////////////////////
     // Hides originals
     + input,
@@ -105,7 +128,6 @@
         display        : inline-flex;
         align-items    : center;
         margin         : $tagMargin 0 $tagMargin $tagMargin;
-      //  vertical-align : top;
         position       : relative;
         z-index        : 1;
         cursor         : default;
@@ -164,10 +186,6 @@
                 }
             }
 
-            @if $showX {
-             //   padding-right:nth($tag-pad, 2) * 3;
-            }
-
             &::before{
                 content: '';
                 position: absolute;
@@ -179,7 +197,7 @@
                 animation : tags--bump .3s ease-out 1;
 
                 box-shadow: 0 0 0 $tag-inset-shadow-size $tag-bg inset;
-                box-shadow: 0 0 0 var(--tag-inset-shadow-size) var(--tag-bg) inset;
+                box-shadow: 0 0 0 calc(var(--tag-inset-shadow-size)) var(--tag-bg) inset;
             }
         }
 
@@ -244,23 +262,27 @@
     &__tag__removeBtn{
         $size: 14px;
 
-        order         : 5;
-        font          : #{$size}/#{$size + 2} Serif;
-        background    : $tag-remove-btn-bg;
-        background    : var(--tag-remove-btn-bg);
-        color         : $tag-text-color;
-        color         : var(--tag-text-color);
-        width         : $size;
-        height        : $size;
-        text-align    : center;
-        border-radius : 50px;
-        cursor        : pointer;
-        margin-right  : $size/3;
-        margin-left   : -$size/3;
-        transition    : .2s ease-out;
+        order          : 5;
+        display        : inline-flex;
+        align-items    : center;
+        justify-content: center;
+        border-radius  : 50px;
+        cursor         : pointer;
+        font           : #{$size} Serif;
+        background     : $tag-remove-btn-bg;
+        background     : var(--tag-remove-btn-bg);
+        color          : $tag-text-color;
+        color          : var(--tag-text-color);
+
+        width          : $size;
+        height         : $size;
+        margin-right   : $size/3;
+        margin-left    : -$size/3;
+
+        transition     : .2s ease-out;
 
         &::after{
-            content:"\00D7";
+            content: "\00D7";
         }
 
         &:hover{
@@ -282,7 +304,6 @@
 
     &:not(#{$self}--mix){
         #{ $self }__input{
-            white-space: nowrap;
             // https://stackoverflow.com/a/13470210/104380
             br { display:none; }
             * { display:inline; white-space:nowrap; }
@@ -301,6 +322,7 @@
         padding: var(--tag-pad, $tag-pad);
         line-height: inherit;
         position: relative;
+        white-space: pre-line; // #160 Line break (\n) as delimeter
 
         &::before{ display:inline-block; width:0; }
 
@@ -342,9 +364,12 @@
         // tries to suggest the rest of the value from the first item in the whitelist which matches it
         &::after{
             content: attr(data-suggest);
+            display: inline-block;
+            white-space: pre; /* allows spaces at the beginning */
             color: $tag-text-color;
             opacity: .3;
             pointer-events:none;
+            max-width: 100px;
         }
 
         // &--invalid{
@@ -371,12 +396,19 @@
         }
     }
 
-    &--mix #{ $self }__input{
-        padding: $tagMargin;
-        margin: 0;
-        width: 100%;
-        height: 100%;
+    &--mix {
         line-height: 1.7;
+
+        #{ $self }__input{
+            padding: $tagMargin;
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            line-height: inherit;
+
+            // no suggested-complete are shown in mix-mode while higilighting dropdown options
+            &::after{ content:none; }
+        }
     }
 
     &--select{
@@ -424,28 +456,57 @@
     // Since the dropdown is an external element, which is positioned directly on the body element
     // it cannot ingerit the CSS variables applied on the ".Tagify" element
     &__dropdown{
+        $dropdown: &;
         position: absolute;
         z-index: 9999;
         background: white;
 
-        max-height: 300px;
         overflow: auto;
         border: 1px solid $tags-focus-border-color;
         box-shadow: 0 2px 4px -2px rgba(black,.2);
         box-sizing: border-box;
+        transition: .25s cubic-bezier(0,1,.45,1);
+        transition-property: transform, max-height, opacity;
 
+        // when the dropdown shows next to the caret while typing
+        &--text{
+            box-shadow: 0 0 0 3px rgba($tags-focus-border-color, .1);
+            font-size: .9em;
+        }
+
+        &__wrapper{
+            max-height: 300px;
+            transition: .25s cubic-bezier(0,1,.45,1);
+        }
+
+        // intial state, pre-rendered
+        &--initial{
+            max-height: 60px;
+            opacity: .7;
+
+            #{$dropdown}__wrapper{
+                transform: translateY(1em);
+            }
+
+            &[placement="bottom"]{
+                #{$dropdown}__wrapper{
+                    transform: translateY(-1em);
+                }
+            }
+        }
 
         &__item{
             box-sizing: inherit;
-            padding: .35em .6em;
-            margin: 2px;
+            padding: $tag-pad;
+            margin: 1px;
             cursor: pointer;
-            border-radius: 3px;
+            border-radius: 2px;
             position: relative;
             outline:none;
 
             &--active{
-                background:$tag-bg;
+                background: $tags-focus-border-color;
+                color: white;
             }
             &:active{
                 filter: brightness(105%);
